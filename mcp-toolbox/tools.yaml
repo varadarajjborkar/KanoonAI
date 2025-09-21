@@ -1,0 +1,51 @@
+sources:
+  legal-doc-source:
+    kind: filesystem
+    path: ./legal-docs
+
+tools:
+  extract-text:
+    kind: python
+    source: legal-doc-source
+    description: Extract text from legal documents (PDF/DOCX)
+    entrypoint: subagents/ExtractTextAgent.py
+
+  simplify-legal-jargon:
+    kind: llm
+    description: Simplify legal text into plain English
+    parameters:
+      - name: text
+        type: string
+
+  highlight-risks:
+    kind: llm
+    description: Detect risky clauses
+    parameters:
+      - name: text
+        type: string
+
+  reference-check:
+    kind: llm
+    description: Compare document against legal-docs reference library
+    parameters:
+      - name: text
+        type: string
+
+  reasoning-agent:
+    kind: llm
+    description: Reason about risky clauses and ensure accurate results
+    parameters:
+      - name: text
+        type: string
+      - name: risks
+        type: list
+      - name: reference_notes
+        type: list
+
+toolsets:
+  legal-assistant:
+    - extract-text
+    - simplify-legal-jargon
+    - highlight-risks
+    - reference-check
+    - reasoning-agent
