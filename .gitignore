@@ -1,0 +1,29 @@
+# dependencies
+node_modules
+
+# next.js
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
+
+# secrets - never commit any env file except the template
+.env
+.env.*
+!.env.example
+
+# the 41 MB upstream dataset; `npm run corpus:fetch` downloads it on demand.
+# The repaired per-Act JSON in data/corpus/acts/ IS committed, so the corpus
+# can be rebuilt without re-downloading.
+/data/corpus/raw
+
+# eval scratch
+/eval/cache
+/eval/runs
+
+# python bytecode from the legacy prototype
+__pycache__
+*.pyc
+
+# os
+.DS_Store

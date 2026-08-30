@@ -1,0 +1,332 @@
+{
+  "version": 2,
+  "builtAt": "2026-08-30T15:38:07.170Z",
+  "source": "India Code (Government of India) via V0RTEXX99/indian-legal-acts-dataset",
+  "encoder": "hashing-client",
+  "dim": 512,
+  "params": {
+    "chunkSize": 900,
+    "chunkOverlap": 180,
+    "structureAware": true
+  },
+  "totals": {
+    "acts": 40,
+    "chunks": 5083,
+    "chars": 3411798,
+    "bytes": 4419023
+  },
+  "acts": [
+    {
+      "id": "corpus:aadhaar-act-2016",
+      "name": "Aadhaar Act 2016",
+      "sections": 67,
+      "chunks": 111,
+      "topics": ""
+    },
+    {
+      "id": "corpus:arbitration-and-conciliation-act-1996",
+      "name": "Arbitration and Conciliation Act 1996",
+      "sections": 101,
+      "chunks": 146,
+      "topics": ""
+    },
+    {
+      "id": "corpus:bharatiya-nyaya-sanhita-2023",
+      "name": "Bharatiya Nyaya Sanhita 2023",
+      "sections": 352,
+      "chunks": 529,
+      "topics": "criminal offences and punishments"
+    },
+    {
+      "id": "corpus:bonded-labour-system-abolition-act-1976",
+      "name": "Bonded Labour System Abolition Act 1976",
+      "sections": 26,
+      "chunks": 40,
+      "topics": ""
+    },
+    {
+      "id": "corpus:code-on-wages-act-2019",
+      "name": "Code on Wages Act 2019",
+      "sections": 62,
+      "chunks": 127,
+      "topics": "salary, minimum wage, deductions"
+    },
+    {
+      "id": "corpus:consumer-protection-act-2019",
+      "name": "Consumer Protection Act 2019",
+      "sections": 107,
+      "chunks": 198,
+      "topics": "defective goods, bad service, refunds, complaints"
+    },
+    {
+      "id": "corpus:delhi-rent-control-act-1958",
+      "name": "Delhi Rent Control Act 1958",
+      "sections": 65,
+      "chunks": 122,
+      "topics": "rent, eviction, landlord and tenant"
+    },
+    {
+      "id": "corpus:dowry-prohibition-act-1961",
+      "name": "Dowry Prohibition Act 1961",
+      "sections": 12,
+      "chunks": 23,
+      "topics": ""
+    },
+    {
+      "id": "corpus:employees-provident-funds-and-miscellaneous-provisions-act-1952",
+      "name": "Employees' Provident Funds and Miscellaneous Provisions Act 1952",
+      "sections": 59,
+      "chunks": 106,
+      "topics": ""
+    },
+    {
+      "id": "corpus:equal-remuneration-act-1976",
+      "name": "Equal Remuneration Act 1976",
+      "sections": 18,
+      "chunks": 31,
+      "topics": ""
+    },
+    {
+      "id": "corpus:hindu-marriage-act-1955",
+      "name": "Hindu Marriage Act 1955",
+      "sections": 35,
+      "chunks": 58,
+      "topics": ""
+    },
+    {
+      "id": "corpus:indian-contract-act-1872",
+      "name": "Indian Contract Act 1872",
+      "sections": 182,
+      "chunks": 226,
+      "topics": "agreements, breach, compensation"
+    },
+    {
+      "id": "corpus:indian-partnership-act-1932",
+      "name": "Indian Partnership Act 1932",
+      "sections": 72,
+      "chunks": 92,
+      "topics": ""
+    },
+    {
+      "id": "corpus:indian-stamp-act-1899",
+      "name": "Indian Stamp Act 1899",
+      "sections": 91,
+      "chunks": 122,
+      "topics": ""
+    },
+    {
+      "id": "corpus:indian-succession-act-1925",
+      "name": "Indian Succession Act 1925",
+      "sections": 377,
+      "chunks": 471,
+      "topics": ""
+    },
+    {
+      "id": "corpus:industrial-disputes-act-1947",
+      "name": "Industrial Disputes Act 1947",
+      "sections": 95,
+      "chunks": 240,
+      "topics": "layoff, retrenchment, unfair dismissal"
+    },
+    {
+      "id": "corpus:information-technology-act-2000",
+      "name": "Information Technology Act 2000",
+      "sections": 105,
+      "chunks": 158,
+      "topics": "online fraud, data, cybercrime"
+    },
+    {
+      "id": "corpus:legal-services-authorities-act-1987",
+      "name": "Legal Services Authorities Act 1987",
+      "sections": 39,
+      "chunks": 72,
+      "topics": "free legal aid, Lok Adalat"
+    },
+    {
+      "id": "corpus:limitation-act-1963",
+      "name": "Limitation Act 1963",
+      "sections": 94,
+      "chunks": 99,
+      "topics": ""
+    },
+    {
+      "id": "corpus:maintenance-and-welfare-of-parents-and-senior-citizens-act-2007",
+      "name": "Maintenance and Welfare of Parents and Senior Citizens Act 2007",
+      "sections": 32,
+      "chunks": 41,
+      "topics": ""
+    },
+    {
+      "id": "corpus:maternity-benefit-act-1961",
+      "name": "Maternity Benefit Act 1961",
+      "sections": 32,
+      "chunks": 48,
+      "topics": ""
+    },
+    {
+      "id": "corpus:minimum-wages-act-1948",
+      "name": "Minimum Wages Act 1948",
+      "sections": 37,
+      "chunks": 79,
+      "topics": ""
+    },
+    {
+      "id": "corpus:motor-vehicles-act-1988",
+      "name": "Motor Vehicles Act 1988",
+      "sections": 218,
+      "chunks": 502,
+      "topics": "accidents, compensation, licences, challans"
+    },
+    {
+      "id": "corpus:muslim-women-protection-of-rights-on-divorce-act-1986",
+      "name": "Muslim Women Protection of Rights on Divorce Act 1986",
+      "sections": 7,
+      "chunks": 15,
+      "topics": ""
+    },
+    {
+      "id": "corpus:muslim-women-protection-of-rights-on-marriage-act-2019",
+      "name": "Muslim Women Protection of Rights on Marriage Act 2019",
+      "sections": 8,
+      "chunks": 8,
+      "topics": ""
+    },
+    {
+      "id": "corpus:negotiable-instruments-act-1881",
+      "name": "Negotiable Instruments Act 1881",
+      "sections": 149,
+      "chunks": 169,
+      "topics": "cheque bounce, promissory notes"
+    },
+    {
+      "id": "corpus:payment-of-gratuity-act-1972",
+      "name": "Payment of Gratuity Act 1972",
+      "sections": 19,
+      "chunks": 45,
+      "topics": "gratuity after 5 years of service"
+    },
+    {
+      "id": "corpus:payment-of-wages-act-1936",
+      "name": "Payment of Wages Act 1936",
+      "sections": 23,
+      "chunks": 67,
+      "topics": ""
+    },
+    {
+      "id": "corpus:protection-of-children-from-sexual-offences-act-2012",
+      "name": "Protection of Children from Sexual Offences Act 2012",
+      "sections": 47,
+      "chunks": 72,
+      "topics": ""
+    },
+    {
+      "id": "corpus:protection-of-women-from-domestic-violence-act-2005",
+      "name": "Protection of Women from Domestic Violence Act 2005",
+      "sections": 34,
+      "chunks": 52,
+      "topics": "protection orders, residence, maintenance"
+    },
+    {
+      "id": "corpus:real-estate-regulation-and-development-act-2016",
+      "name": "Real Estate Regulation and Development Act 2016",
+      "sections": 90,
+      "chunks": 185,
+      "topics": "flat booking, builder delays, RERA"
+    },
+    {
+      "id": "corpus:registration-act-1908",
+      "name": "Registration Act 1908",
+      "sections": 93,
+      "chunks": 118,
+      "topics": ""
+    },
+    {
+      "id": "corpus:right-of-children-to-free-and-compulsory-education-act-2009",
+      "name": "Right of Children to Free and Compulsory Education Act 2009",
+      "sections": 36,
+      "chunks": 52,
+      "topics": ""
+    },
+    {
+      "id": "corpus:right-to-information-act-2005",
+      "name": "Right to Information Act 2005",
+      "sections": 28,
+      "chunks": 77,
+      "topics": "RTI applications, appeals, exemptions"
+    },
+    {
+      "id": "corpus:rights-of-persons-with-disabilities-act-2016",
+      "name": "Rights of Persons with Disabilities Act 2016",
+      "sections": 102,
+      "chunks": 163,
+      "topics": ""
+    },
+    {
+      "id": "corpus:sexual-harassment-of-women-at-workplace-act-2013",
+      "name": "Sexual Harassment of Women at Workplace Act 2013",
+      "sections": 28,
+      "chunks": 54,
+      "topics": "POSH complaints, internal committee"
+    },
+    {
+      "id": "corpus:special-marriage-act-1954",
+      "name": "Special Marriage Act 1954",
+      "sections": 57,
+      "chunks": 74,
+      "topics": ""
+    },
+    {
+      "id": "corpus:specific-relief-act-1963",
+      "name": "Specific Relief Act 1963",
+      "sections": 44,
+      "chunks": 62,
+      "topics": ""
+    },
+    {
+      "id": "corpus:transfer-of-property-act-1882",
+      "name": "Transfer of Property Act 1882",
+      "sections": 129,
+      "chunks": 203,
+      "topics": "sale, lease, mortgage, gift of property"
+    },
+    {
+      "id": "corpus:unorganised-sector-workers-social-security-act-2008",
+      "name": "Unorganised Sector Workers Social Security Act 2008",
+      "sections": 17,
+      "chunks": 26,
+      "topics": ""
+    }
+  ],
+  "shards": [
+    {
+      "file": "shard-000.json",
+      "chunks": 900,
+      "bytes": 772417
+    },
+    {
+      "file": "shard-001.json",
+      "chunks": 900,
+      "bytes": 778632
+    },
+    {
+      "file": "shard-002.json",
+      "chunks": 900,
+      "bytes": 758524
+    },
+    {
+      "file": "shard-003.json",
+      "chunks": 900,
+      "bytes": 788593
+    },
+    {
+      "file": "shard-004.json",
+      "chunks": 900,
+      "bytes": 800907
+    },
+    {
+      "file": "shard-005.json",
+      "chunks": 583,
+      "bytes": 519950
+    }
+  ]
+}

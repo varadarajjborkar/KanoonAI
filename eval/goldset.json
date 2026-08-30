@@ -1,0 +1,308 @@
+{
+  "name": "KanoonAI retrieval gold set v1",
+  "purpose": "One fixed batch used to tune retrieval parameters. Queries are written the way our actual users write - short, worried, sometimes ungrammatical, sometimes Hinglish, rarely using the correct legal term. A retrieved chunk counts as relevant only if it comes from the expected Act AND the expected section, so a run cannot be gamed by returning the right Act's table of contents.",
+  "batch": [
+    {
+      "id": "cheque-bounce",
+      "query": "someone gave me a cheque and it bounced what can i do",
+      "relevant": [
+        {
+          "act": "Negotiable Instruments Act 1881",
+          "refs": [
+            "S. 138"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cheque-bounce-hinglish",
+      "query": "cheque bounce ho gaya hai mera paisa kaise milega",
+      "relevant": [
+        {
+          "act": "Negotiable Instruments Act 1881",
+          "refs": [
+            "S. 138"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deposit-not-returned",
+      "query": "landlord is not giving back my security deposit after i left the house",
+      "relevant": [
+        {
+          "act": "Transfer of Property Act 1882",
+          "refs": [
+            "S. 108"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "breach-compensation",
+      "query": "the other party broke our agreement, can i get money for my loss",
+      "relevant": [
+        {
+          "act": "Indian Contract Act 1872",
+          "refs": [
+            "S. 73",
+            "S. 74"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gratuity-eligibility",
+      "query": "i worked 6 years in company will i get gratuity",
+      "relevant": [
+        {
+          "act": "Payment of Gratuity Act 1972",
+          "refs": [
+            "S. 4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "maternity-leave",
+      "query": "how many months leave i can take for having baby",
+      "relevant": [
+        {
+          "act": "Maternity Benefit Act 1961",
+          "refs": [
+            "S. 5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rti-apply",
+      "query": "how do i ask government office for information",
+      "relevant": [
+        {
+          "act": "Right to Information Act 2005",
+          "refs": [
+            "S. 6"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "domestic-violence",
+      "query": "my husband beats me what order can court give to stop him",
+      "relevant": [
+        {
+          "act": "Protection of Women from Domestic Violence Act 2005",
+          "refs": [
+            "S. 18"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "posh-complaint",
+      "query": "my manager is harassing me at office how do i complain",
+      "relevant": [
+        {
+          "act": "Sexual Harassment of Women at Workplace Act 2013",
+          "refs": [
+            "S. 9"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "accident-claim",
+      "query": "truck hit my father on road, how to claim money",
+      "relevant": [
+        {
+          "act": "Motor Vehicles Act 1988",
+          "refs": [
+            "S. 166"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "free-lawyer",
+      "query": "i have no money for lawyer can i get free one",
+      "relevant": [
+        {
+          "act": "Legal Services Authorities Act 1987",
+          "refs": [
+            "S. 12",
+            "S. 13"
+          ]
+        }
+      ],
+      "note": "S.12 sets the criteria for free legal aid, S.13 the entitlement; either answers the question."
+    },
+    {
+      "id": "parents-maintenance",
+      "query": "my son does not take care of me i am 70 years old",
+      "relevant": [
+        {
+          "act": "Maintenance and Welfare of Parents and Senior Citizens Act 2007",
+          "refs": [
+            "S. 4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "retrenchment",
+      "query": "company removed me from job without any notice is that allowed",
+      "relevant": [
+        {
+          "act": "Industrial Disputes Act 1947",
+          "refs": [
+            "S. 25F"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "register-property",
+      "query": "do i have to register the sale paper of my land",
+      "relevant": [
+        {
+          "act": "Registration Act 1908",
+          "refs": [
+            "S. 17"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "make-will",
+      "query": "how to write a will properly so nobody can challenge",
+      "relevant": [
+        {
+          "act": "Indian Succession Act 1925",
+          "refs": [
+            "S. 63"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "force-sale",
+      "query": "seller took my money but refuses to give the flat, can court force him",
+      "relevant": [
+        {
+          "act": "Specific Relief Act 1963",
+          "refs": [
+            "S. 10"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "online-fraud",
+      "query": "someone used my photo and id to make fake account and took money",
+      "relevant": [
+        {
+          "act": "Information Technology Act 2000",
+          "refs": [
+            "S. 66C",
+            "S. 66D"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dowry",
+      "query": "in laws are asking for money and gold before marriage",
+      "relevant": [
+        {
+          "act": "Dowry Prohibition Act 1961",
+          "refs": [
+            "S. 3",
+            "S. 4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "builder-delay",
+      "query": "builder is 3 years late giving my flat, can i take my money back",
+      "relevant": [
+        {
+          "act": "Real Estate Regulation and Development Act 2016",
+          "refs": [
+            "S. 18"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "school-seat",
+      "query": "private school refused admission to my child we are poor family",
+      "relevant": [
+        {
+          "act": "Right of Children to Free and Compulsory Education Act 2009",
+          "refs": [
+            "S. 12"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "divorce-grounds",
+      "query": "on what basis can i take divorce from my wife",
+      "relevant": [
+        {
+          "act": "Hindu Marriage Act 1955",
+          "refs": [
+            "S. 13"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "disability-job",
+      "query": "i am handicapped is there any quota in government job",
+      "relevant": [
+        {
+          "act": "Rights of Persons with Disabilities Act 2016",
+          "refs": [
+            "S. 34"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "salary-not-paid",
+      "query": "boss not paying my salary since 3 months kya karu",
+      "relevant": [
+        {
+          "act": "Code on Wages Act 2019",
+          "refs": [
+            "S. 43"
+          ]
+        },
+        {
+          "act": "Payment of Wages Act 1936",
+          "refs": [
+            "S. 15",
+            "S. 16",
+            "S. 17"
+          ]
+        }
+      ],
+      "note": "Both the Code on Wages 2019 and the claims machinery of the Payment of Wages Act 1936 are correct routes for unpaid salary."
+    },
+    {
+      "id": "cheating-offence",
+      "query": "a man took 2 lakh from me by lying, is this a crime",
+      "relevant": [
+        {
+          "act": "Bharatiya Nyaya Sanhita 2023",
+          "refs": [
+            "S. 318"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+@import 'tailwindcss';
+
+/*
+  KanoonAI visual language.
+
+  The audience is someone anxious about a document they do not understand, often
+  on a mid-range Android phone. So: high contrast, generous line height, large
+  tap targets, and colour used only where it carries meaning (risk severity,
+  which source a fact came from).
+*/
+
+@theme {
+  --color-ink: #0b0d12;
+  --color-surface: #12151d;
+  --color-raised: #1a1f2b;
+  --color-line: #262d3d;
+  --color-line-soft: #1e2431;
+
+  --color-text: #e8eaf0;
+  --color-muted: #98a1b5;
+  --color-faint: #6b7488;
+
+  --color-brand: #6ea8fe;
+  --color-brand-deep: #3b7ddd;
+
+  --color-law: #7dd3a7;
+  --color-doc: #f0b866;
+
+  --color-risk-high: #f2777a;
+  --color-risk-med: #e8b46b;
+  --color-risk-low: #8fb8e8;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans',
+    'Noto Sans Devanagari', Arial, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2c3446 transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #2c3446;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-rise {
+  animation: rise 0.22s ease-out both;
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.animate-pulse-soft {
+  animation: pulse-soft 1.4s ease-in-out infinite;
+}
+
+/* Answer body: readability is the product, so type is set generously. */
+.prose-answer {
+  line-height: 1.75;
+  font-size: 1rem;
+}
+.prose-answer p {
+  margin: 0 0 0.85rem;
+}
+.prose-answer strong {
+  color: #fff;
+  font-weight: 650;
+}
+.prose-answer ul,
+.prose-answer ol {
+  margin: 0 0 0.9rem;
+  padding-left: 1.25rem;
+}
+.prose-answer li {
+  margin: 0.3rem 0;
+}
+.prose-answer ul {
+  list-style: disc;
+}
+.prose-answer ol {
+  list-style: decimal;
+}
+.prose-answer h1,
+.prose-answer h2,
+.prose-answer h3 {
+  font-weight: 650;
+  color: #fff;
+  margin: 1.2rem 0 0.5rem;
+  font-size: 1rem;
+}
+.prose-answer code {
+  background: var(--color-raised);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.prose-answer table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0 1rem;
+  font-size: 0.9rem;
+}
+.prose-answer th,
+.prose-answer td {
+  border: 1px solid var(--color-line);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+.prose-answer a {
+  color: var(--color-brand);
+  text-decoration: underline;
+}
