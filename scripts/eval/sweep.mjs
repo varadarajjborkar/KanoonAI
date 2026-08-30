@@ -12,11 +12,11 @@
  *
  * The objective is deliberately not raw recall:
  *
- *     0.6 * hit@topK  +  0.4 * MRR  -  0.08 * (avgContextChars / 24000)
+ *     0.6*hit + 0.4*MRR - 0.08*(contextChars/24000) - 0.02*(ms/1000)
  *
- * Recall alone is bought by raising topK; the context term makes that a real
- * trade-off, which is what it is in production - more context costs latency,
- * money, and the model's attention.
+ * Recall alone is bought by raising topK, and ranking quality can be bought with
+ * an expensive re-ranker. Pricing both context and time makes those the real
+ * trade-offs they are in production.
  *
  * Writes the winner to src/lib/rag/tuned.ts and a report to eval/report.md.
  */
@@ -244,12 +244,12 @@ Generated ${new Date().toISOString()} against \`eval/goldset.json\` (${batch.len
 ## Objective
 
 \`\`\`
-0.6 * hit@topK  +  0.4 * MRR  -  0.08 * (avgContextChars / 24000)
+0.6*hit + 0.4*MRR - 0.08*(contextChars/24000) - 0.02*(ms/1000)
 \`\`\`
 
-Recall on its own is bought by raising \`topK\`. The context penalty turns that
-into a real trade-off, which is what it is in production: a bigger context costs
-latency, money, and the model's attention.
+Recall on its own is bought by raising \`topK\`, and ranking quality can be bought
+with an expensive re-ranker. Pricing both context and time turns those into the
+real trade-offs they are in production.
 
 ## Result
 

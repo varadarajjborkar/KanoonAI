@@ -272,37 +272,41 @@ cannot be gamed by returning the right Act's table of contents.
 ### Objective
 
 ```
-0.6 * hit@topK  +  0.4 * MRR  -  0.08 * (avgContextChars / 24000)
+0.6*hit@topK + 0.4*MRR - 0.08*(contextChars/24000) - 0.02*(ms/1000)
 ```
 
-Recall on its own is bought by raising `topK`. The context penalty makes that a
-real trade-off, which is what it is in production: a bigger context costs
-latency, money, and the model's attention.
+Quality minus what it costs to get. Recall on its own is bought by raising
+`topK`, and ranking quality is bought with an expensive re-ranker, so both
+context and time are priced.
+
+The latency term was not there originally, and its absence showed. The sweep
+accepted the LLM re-ranker for a gain that was **entirely ordering**: identical
+hit rate, 300x the retrieval time. Since every retrieved passage goes into the
+prompt regardless, reordering them barely changes what the model reads. Context
+was priced and time was free, so the search spent time freely. With time priced
+at roughly "one second is worth three points of hit rate", the same comparison
+comes out 0.5952 off versus 0.5862 on, and the re-ranker is correctly rejected:
+same answers, 500x faster.
 
 ### Result
 
 Averaged over three rewrite samples, 24 gold queries:
 
-| | baseline | tuned |
-|---|---|---|
-| hit@topK | 0.083 | **0.778** |
-| MRR | 0.014 | **0.497** |
-| nDCG | 0.030 | **0.749** |
-| coverage | 0.083 | **0.715** |
-| spread across samples | — | 0.042 |
+| | baseline | tuned | held out |
+|---|---|---|---|
+| hit@topK | 0.083 | 0.764 | **0.694** |
+| MRR | 0.014 | 0.398 | **0.444** |
+| nDCG | 0.030 | 0.907 | **0.928** |
+| retrieval latency | 14 ms | **4 ms** | 3 ms |
 
-22 of the 24 gold queries retrieve the exact right section of the exact right
-Act.
+**Read the held-out column.** "Tuned" is measured on the three samples in
+[`eval/rewrites/`](eval/rewrites/) that the sweep optimised against, so it is
+optimistic by construction. "Held out" re-generates the samples from scratch, so
+the parameters have never seen them. The 0.764 to 0.694 gap is what remains of
+fitting the tuning samples; averaging over three of them shrank it but did not
+remove it, and **0.694 is the number to believe for an unseen run**.
 
-**Held out:** re-generating the rewrite samples from scratch, so the tuned
-parameters have never seen them, gives **hit@topK 0.736**. The gap between 0.778
-and 0.736 is what is left of fitting the tuning samples; averaging over three of
-them shrank it but did not remove it. 0.736 is the number to believe for an
-unseen run, and the two queries that miss are the same ones either way.
-
-The full run, every parameter's table, and the per-query outcome are written to
-[`eval/report.md`](eval/report.md), and the winning values to
-[`src/lib/rag/tuned.ts`](src/lib/rag/tuned.ts).
+That is still 8.4x the untuned baseline, at 4 ms of retrieval per query.
 
 ### What the sweep found
 
@@ -311,11 +315,12 @@ The full run, every parameter's table, and the per-query outcome are written to
   word for their problem, so bridging vocabulary is the whole game.
 - **Smaller chunks win.** `1800 → 600` characters. A statutory section is a
   natural retrieval unit and cutting across several dilutes every one of them.
-- **Heading weighting is worth 6x.** Statutory marginal notes state the topic
+- **Heading weighting is worth 3x.** Statutory marginal notes state the topic
   far more directly than the operative text does.
-- **The re-ranker was rejected twice.** At about 15x the retrieval latency it did
-  not merely fail to help, it scored slightly worse (-0.021 objective). It is off
-  by default; the code is there and one toggle switches it on.
+- **The re-ranker was rejected**, on latency. It reordered results without
+  finding any the retriever had missed, so hit rate was identical and only the
+  ranking metrics moved, for 500x the retrieval time. Off by default; the code is
+  there and one toggle switches it on.
 - **Neighbour expansion was rejected on cost.** It bought hit rate for several
   times the context. Under the stated objective that is not a good trade.
 
@@ -574,17 +579,17 @@ scripts/
 
 ## Known limitations
 
-- **Retrieval is at 78% on the gold set**, measured strictly: right Act *and*
-  right section. Two queries still miss in every sample. `deposit-not-returned`
+- **Retrieval is at 69% held out**, measured strictly: right Act *and* right
+  section. Three or four queries miss depending on the sample. `deposit-not-returned`
   wants s.108 of the Transfer of Property Act, whose heading ("Rights and
   liabilities of lessor and lessee") never mentions deposits; `retrenchment`
   wants s.25F of the Industrial Disputes Act, which the rewriter reliably
   describes in words the section does not use. Both are vocabulary gaps that
   heading weighting cannot close.
 - **The pipeline is not deterministic.** Rewriting is a model call, so the same
-  question can retrieve differently on two runs. The tuned configuration varies
-  by about 0.04 hit@topK across rewrite samples. Reported numbers are averages,
-  not best-of.
+  question can retrieve differently on two runs: hit@topK varies by up to 0.125
+  across rewrite samples. Every number here is an average over three samples,
+  never a best-of.
 - **The corpus is 40 Acts, not all of Indian law.** Questions outside it fall
   back to a grounded "I could not find this" rather than a guess. State
   amendments, rules, and case law are not included.

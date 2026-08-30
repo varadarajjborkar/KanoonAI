@@ -88,10 +88,10 @@ function dcg(gains) {
 /**
  * Run the full batch under one parameter set.
  *
- * The objective deliberately charges for context: recall is trivial to buy by
- * raising topK, and a bigger context costs the user latency, money and - the
- * part that actually matters here - the model's attention. So the sweep has to
- * find genuine gains, not just a bigger k.
+ * The objective charges for both context and time: recall is trivial to buy by
+ * raising topK, and ranking quality is trivial to buy with an expensive
+ * re-ranker. Pricing both makes the sweep find genuine gains rather than just
+ * spending more of the user's money and patience.
  */
 export async function evaluate(batch, paramOverrides, opts = {}) {
   const params = withParams(paramOverrides);
@@ -142,6 +142,7 @@ export async function evaluate(batch, paramOverrides, opts = {}) {
   const avgContext = mean('contextChars');
   const hit = mean('hit');
   const mrr = mean('rr');
+  const msPerQuery = totalMs / (batch.length || 1);
 
   return {
     hit,
@@ -151,9 +152,20 @@ export async function evaluate(batch, paramOverrides, opts = {}) {
     coverage: mean('coverage'),
     avgContext,
     avgReturned: mean('returned'),
-    msPerQuery: totalMs / (batch.length || 1),
-    // 0.08 is the price of a full context window, in units of hit-rate.
-    objective: 0.6 * hit + 0.4 * mrr - 0.08 * (avgContext / 24000),
+    msPerQuery,
+    /**
+     * Quality minus what it costs to get.
+     *
+     *   0.08 per full context window - money, and the model's attention.
+     *   0.02 per second of retrieval  - the user sitting there waiting.
+     *
+     * The latency term was missing at first, and its absence showed: the sweep
+     * accepted the LLM re-ranker for a pure ordering gain, at 300x the retrieval
+     * time and no improvement in hit rate at all. Context was priced and time
+     * was free, so the search happily spent time. Both are real costs.
+     */
+    objective:
+      0.6 * hit + 0.4 * mrr - 0.08 * (avgContext / 24000) - 0.02 * (msPerQuery / 1000),
     perQuery,
     chunkCount: chunks.length,
   };
