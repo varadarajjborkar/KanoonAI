@@ -30,5 +30,10 @@ export async function GET() {
       embeddings: config.ollama.embedModel ? 'remote' : 'local-hashing',
     },
     history: backend(),
+    historySource: process.env.UPSTASH_REDIS_REST_URL
+      ? 'UPSTASH_REDIS_REST_*'
+      : process.env.KV_REST_API_URL
+        ? 'KV_REST_API_* (Vercel integration)'
+        : 'none',
   });
 }

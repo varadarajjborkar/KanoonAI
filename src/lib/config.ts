@@ -17,8 +17,11 @@ export const config = {
     timeoutMs: Number(env('OLLAMA_TIMEOUT_MS', '90000')),
   },
   redis: {
-    url: env('UPSTASH_REDIS_REST_URL'),
-    token: env('UPSTASH_REDIS_REST_TOKEN'),
+    // Vercel's Upstash marketplace integration injects KV_REST_API_* while a
+    // database created directly on Upstash gives UPSTASH_REDIS_REST_*. Accept
+    // both so the app works however the database was provisioned.
+    url: env('UPSTASH_REDIS_REST_URL') || env('KV_REST_API_URL'),
+    token: env('UPSTASH_REDIS_REST_TOKEN') || env('KV_REST_API_TOKEN'),
   },
   limits: {
     maxDocChars: Number(env('NEXT_PUBLIC_MAX_DOC_CHARS', '400000')),
