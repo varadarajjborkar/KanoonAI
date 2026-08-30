@@ -20,7 +20,8 @@ const STARTERS = [
 ];
 
 export function EmptyState() {
-  const { docs, send } = useApp();
+  const docs = useApp((s) => s.docs);
+  const send = useApp.getState().send;
   const [manifest, setManifest] = useState<CorpusManifest | null>(null);
 
   useEffect(() => {

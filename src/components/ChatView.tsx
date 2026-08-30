@@ -4,13 +4,25 @@ import { useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { AlertCircle, Menu, Sparkles, X } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { useApp } from '@/lib/client/store';
 import { MessageBubble } from './MessageBubble';
 import { Composer } from './Composer';
 import { EmptyState } from './EmptyState';
 
 export function ChatView({ onOpenMenu }: { onOpenMenu: () => void }) {
-  const { messages, streaming, stage, busy, error, clearError, corpus, banner, setBanner } = useApp();
+  const { messages, streaming, stage, busy, error, corpus, banner } = useApp(
+    useShallow((s) => ({
+      messages: s.messages,
+      streaming: s.streaming,
+      stage: s.stage,
+      busy: s.busy,
+      error: s.error,
+      corpus: s.corpus,
+      banner: s.banner,
+    })),
+  );
+  const { clearError, setBanner } = useApp.getState();
   const endRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const pinned = useRef(true);

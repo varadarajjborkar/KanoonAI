@@ -8,7 +8,8 @@ import { Sidebar } from '@/components/Sidebar';
 import { ChatView } from '@/components/ChatView';
 
 export default function Home() {
-  const { user, signIn, setBanner } = useApp();
+  const user = useApp((s) => s.user);
+  const { signIn, setBanner } = useApp.getState();
   const [ready, setReady] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 

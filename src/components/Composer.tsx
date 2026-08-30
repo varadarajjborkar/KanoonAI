@@ -2,11 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { ArrowUp, Paperclip, Square } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { useApp } from '@/lib/client/store';
 import { SUPPORTED } from '@/lib/client/extract';
 
 export function Composer() {
-  const { busy, send, stop, upload, uploading } = useApp();
+  // Only `busy` and `uploading` affect what the composer draws; the actions are
+  // stable, so reading them off the store keeps typing smooth while an answer
+  // is streaming in.
+  const { busy, uploading } = useApp(useShallow((s) => ({ busy: s.busy, uploading: s.uploading })));
+  const { send, stop, upload } = useApp.getState();
   const [text, setText] = useState('');
   const [dragging, setDragging] = useState(false);
   const areaRef = useRef<HTMLTextAreaElement>(null);

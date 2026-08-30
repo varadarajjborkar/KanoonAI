@@ -5,15 +5,26 @@ import {
   FileText, HardDrive, LogOut, MessageSquarePlus, PanelLeftClose,
   Scale, Settings2, Trash2, X,
 } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { useApp } from '@/lib/client/store';
 import { relativeTime } from '@/lib/client/format';
 
 /** Recent chats, the documents held in this browser, and the storage footprint. */
 export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const {
-    user, chats, activeId, docs, scopedDocIds, storage,
-    newChat, openChat, removeChat, removeDoc, toggleScope, signOut, refreshStorage,
-  } = useApp();
+  // Selector, not a whole-store subscription: the sidebar must not re-render on
+  // every streamed token.
+  const { user, chats, activeId, docs, scopedDocIds, storage } = useApp(
+    useShallow((s) => ({
+      user: s.user,
+      chats: s.chats,
+      activeId: s.activeId,
+      docs: s.docs,
+      scopedDocIds: s.scopedDocIds,
+      storage: s.storage,
+    })),
+  );
+  const { newChat, openChat, removeChat, removeDoc, toggleScope, signOut, refreshStorage } =
+    useApp.getState();
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
@@ -181,7 +192,8 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 /** Exposes the retrieval knobs, so the tuning story is visible, not buried. */
 function SettingsDrawer({ onClose }: { onClose: () => void }) {
-  const { params, setParams, resetParams, wipe } = useApp();
+  const params = useApp((s) => s.params);
+  const { setParams, resetParams, wipe } = useApp.getState();
   const [health, setHealth] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
