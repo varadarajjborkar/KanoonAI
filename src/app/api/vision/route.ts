@@ -6,7 +6,9 @@ import { rateLimit } from '@/lib/redis';
 import { config } from '@/lib/config';
 
 export const runtime = 'nodejs';
-export const maxDuration = 120;
+// 60s is the Hobby-tier ceiling on Vercel. Answers take ~10s and a page
+// transcription ~3s, so this is headroom rather than a constraint.
+export const maxDuration = 60;
 
 /**
  * Vision OCR for scanned pages and phone photos of documents.

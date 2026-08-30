@@ -13,7 +13,9 @@ import { bad, requireUser } from '@/lib/http';
 import { rateLimit } from '@/lib/redis';
 
 export const runtime = 'nodejs';
-export const maxDuration = 120;
+// 60s is the Hobby-tier ceiling on Vercel. Answers take ~10s and a page
+// transcription ~3s, so this is headroom rather than a constraint.
+export const maxDuration = 60;
 
 const Body = z.object({
   question: z.string().min(1).max(4000),
