@@ -4,7 +4,7 @@ import { create } from 'zustand';
 import type { ChatSummary, Citation, DocMeta, Message, RiskFinding } from '../types.ts';
 import type { RagParams } from '../rag/params.ts';
 import { TUNED_PARAMS } from '../rag/tuned.ts';
-import { STORES, deleteDoc, get, listDocs, put, storageEstimate, wipeAll } from './idb.ts';
+import { STORES, del, deleteDoc, get, getAll, listDocs, put, storageEstimate, wipeAll } from './idb.ts';
 import { ask, ingestFile, invalidateIndex } from './pipeline.ts';
 
 /**
@@ -165,17 +165,52 @@ export const useApp = create<AppState>((set, getState) => ({
   async removeChat(id) {
     const { user, activeId } = getState();
     set({ chats: getState().chats.filter((c) => c.id !== id) });
-    if (user) await fetch(`/api/chats/${id}`, { method: 'DELETE', headers: { 'x-kanoon-user': user } }).catch(() => undefined);
+    // Delete locally too, or the next refresh reads it straight back out of
+    // IndexedDB and the chat reappears.
+    await del(STORES.chats, id).catch(() => undefined);
+    if (user) {
+      await fetch(`/api/chats/${id}`, {
+        method: 'DELETE',
+        headers: { 'x-kanoon-user': user },
+      }).catch(() => undefined);
+    }
     if (activeId === id) getState().newChat();
   },
 
+  /**
+   * Recent chats come from the browser first, then Redis on top.
+   *
+   * Redis is a cross-device mirror, not the source of truth. On serverless the
+   * in-memory fallback does not survive between invocations, so a deployment
+   * without Upstash would otherwise show an empty sidebar even though every
+   * chat is sitting in IndexedDB. Local-first means the app is complete on its
+   * own and Redis only adds sync.
+   */
   async refreshChats() {
     const { user } = getState();
     if (!user) return;
+
+    const merged = new Map<string, ChatSummary>();
+    const local = await getAll<LocalChat>(STORES.chats).catch(() => []);
+    for (const c of local) {
+      merged.set(c.id, {
+        id: c.id,
+        title: c.title,
+        updatedAt: c.updatedAt,
+        docCount: c.docIds?.length ?? 0,
+      });
+    }
+
     const res = await fetch('/api/chats', { headers: { 'x-kanoon-user': user } }).catch(() => null);
-    if (!res?.ok) return;
-    const { chats } = (await res.json()) as { chats: ChatSummary[] };
-    set({ chats });
+    if (res?.ok) {
+      const { chats } = (await res.json()) as { chats: ChatSummary[] };
+      // The server copy wins on ties: it is the one shared across devices.
+      for (const c of chats) merged.set(c.id, c);
+    }
+
+    set({
+      chats: [...merged.values()].sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 40),
+    });
   },
 
   /* ----------------------------------------------------------- documents */

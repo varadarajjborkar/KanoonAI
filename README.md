@@ -148,8 +148,12 @@ Everything the user owns lives in IndexedDB under the `kanoonai` database:
 
 Redis stores only the recent-chat list, message history for the sidebar, and a
 short list of durable non-identifying facts ("is a tenant in Pune"). Both are
-namespaced per username and expire after 30 days. If Redis is not configured the
-app falls back to an in-process map and nothing in the UI breaks.
+namespaced per username and expire after 30 days.
+
+Redis is a mirror, never the source of truth. The sidebar reads IndexedDB first
+and layers the server copy on top, so the app is complete without Redis and
+Redis only adds sync across devices. This matters on serverless in particular,
+where the in-memory fallback does not survive between invocations.
 
 The sidebar shows live storage usage, and there is a one-click wipe in Settings.
 
