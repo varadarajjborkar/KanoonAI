@@ -1,0 +1,388 @@
+{
+  "cheque-bounce": {
+    "queries": [
+      "someone gave me a cheque and it bounced what can i do",
+      "dishonor of cheque under Section 138 of the Negotiable Instruments Act 1881",
+      "dishonor of cheque under Section 138 of the Negotiable Instruments Act 1881 file complaint",
+      "dishonor of cheque under Section 138 of the Negotiable Instruments Act 1881 remedy",
+      "dishonor of cheque under Section 138 of the Negotiable Instruments Act 1881 civil liability"
+    ],
+    "terms": [
+      "dishonor of cheque",
+      "Section 138",
+      "Negotiable Instruments Act 1881",
+      "criminal complaint",
+      "compensation for loss",
+      "court proceedings"
+    ],
+    "clarified": "The user wants to know what legal steps they can take after a cheque they received was bounced."
+  },
+  "cheque-bounce-hinglish": {
+    "queries": [
+      "cheque bounce ho gaya hai mera paisa kaise milega",
+      "dishonour of cheque statutory remedy process India",
+      "Section 138 of the Negotiable Instruments Act 1881 procedure to recover amount",
+      "cheque bounce claim filing timeline under Indian law",
+      "execution of cheque dishonour notice and legal notice to drawer"
+    ],
+    "terms": [
+      "Section 138 Negotiable Instruments Act",
+      "dishonour of cheque",
+      "legal notice under Section 138",
+      "recovery of amount under Section 138"
+    ],
+    "clarified": "The user wants to know how to obtain the money after a cheque has bounced in India."
+  },
+  "deposit-not-returned": {
+    "queries": [
+      "landlord is not giving back my security deposit after i left the house",
+      "security deposit not returned by landlord",
+      "refund of security deposit under the Transfer of Property Act 1882",
+      "conditions for withholding security deposit in rental agreement, India",
+      "landlord's obligations regarding security deposit return after termination of tenancy"
+    ],
+    "terms": [
+      "Transfer of Property Act 1882",
+      "Section 108",
+      "refund of security deposit",
+      "withholding of security deposit"
+    ],
+    "clarified": "The user wants to legally compel the landlord to return the security deposit after moving out."
+  },
+  "breach-compensation": {
+    "queries": [
+      "the other party broke our agreement, can i get money for my loss",
+      "breach of contract damages claim",
+      "recovery of loss due to agreement breach under Indian Contract Act 1872",
+      "compensation for loss arising from breach of agreement",
+      "suit for damages under Section 73 of the Indian Contract Act"
+    ],
+    "terms": [
+      "breach of contract",
+      "Indian Contract Act 1872",
+      "Section 73",
+      "compensation for loss"
+    ],
+    "clarified": "The user wants to know if they can claim monetary compensation for financial loss caused by the other party breaking their agreement."
+  },
+  "gratuity-eligibility": {
+    "queries": [
+      "i worked 6 years in company will i get gratuity",
+      "qualification for gratuity under the Payment of Gratuity Act 1972",
+      "computation of gratuity after continuous service of six years under the Payment of Gratuity Act 1972",
+      "continuous service entitlement to gratuity after six years employment in India",
+      "right to gratuity following six years of service under the Payment of Gratuity Act 1972"
+    ],
+    "terms": [
+      "Payment of Gratuity Act",
+      "Gratuity",
+      " six consecutive years of service"
+    ],
+    "clarified": "You want to know whether, after completing six years of continuous employment, you are entitled to receive a gratuity under Indian law."
+  },
+  "maternity-leave": {
+    "queries": [
+      "how many months leave i can take for having baby",
+      "maternal leave entitlement after first confinement according to the Maternity Benefit Act 1961",
+      "maximum paid maternity leave duration for first child in India",
+      "statutory maternity leave length for first pregnancy under the Maternity Benefit Act 1961",
+      "right to maternal leave following a newborn delivery in accordance with Indian labour law"
+    ],
+    "terms": [
+      "Maternity Benefit Act, 1961",
+      "Section 5(1)",
+      "Section 6(1)",
+      "first confinement"
+    ],
+    "clarified": "The user wants to know how many months of paid leave they can take after giving birth to their child."
+  },
+  "rti-apply": {
+    "queries": [
+      "how do i ask government office for information",
+      "how to obtain information from central government departments in India",
+      "application of Section 6 and 8 of the Right to Information Act 2005 in formal written format",
+      "procedure for filing a RTI request to seek documents from any public authority",
+      "jurisdiction of the Central Information Commission in grievance redressal"
+    ],
+    "terms": [
+      "Right to Information Act 2005",
+      "Section 6",
+      "Section 8",
+      "Central Information Commission"
+    ],
+    "clarified": "how to formally request information from a government office under Indian law"
+  },
+  "domestic-violence": {
+    "queries": [
+      "my husband beats me what order can court give to stop him",
+      "petition for protection order under Section 12 and 14 of Protection of Women from Domestic Violence Act 2005",
+      "application for temporary injunction in domestic violence case under Code of Civil Procedure 1908",
+      "complaint under Section 498A IPC for domestic abuse and assault",
+      "seeking restraining order against abusive spouse under Section 37 of the Protection of Women from Domestic Violence Act 2005"
+    ],
+    "terms": [
+      "Protection of Women from Domestic Violence Act 2005",
+      "Section 12 and Section 14 of Domestic Violence Act",
+      "Section 37 of Domestic Violence Act",
+      "restraining order India",
+      "temporary injunction domestic violence"
+    ],
+    "clarified": "The user wants to know what court order can be obtained to stop her husband from beating her."
+  },
+  "posh-complaint": {
+    "queries": [
+      "my manager is harassing me at office how do i complain",
+      "sexual harassment at workplace complaint under Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act 2013",
+      "workplace harassment grievance redressal mechanism",
+      "distributor of Sexual Harassment of Women at Workplace Act 2013",
+      "internal policy for harassment grievances Indian company"
+    ],
+    "terms": [
+      "Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act 2013",
+      "Poshan (Prevention of Sexual Harassment) policy"
+    ],
+    "clarified": "I want to file a formal complaint about workplace harassment by my manager and learn how to do so under Indian law"
+  },
+  "accident-claim": {
+    "queries": [
+      "truck hit my father on road, how to claim money",
+      "road traffic accident claim compensation",
+      "claim for death of father due to motor vehicle accident under Motor Vehicles Act 1988",
+      "family compensation claim under motor accident claims tribunal rules",
+      "medical expenses and loss of consortium claim following fatal road accident"
+    ],
+    "terms": [
+      "Motor Vehicles Act, 1988",
+      "Section 146",
+      "Motor Accident Claims Tribunal (M.A.C.T.)",
+      "compensation for death caused by negligent driving"
+    ],
+    "clarified": "How to obtain monetary compensation for the death of the user's father caused by a truck hitting him on the road."
+  },
+  "free-lawyer": {
+    "queries": [
+      "i have no money for lawyer can i get free one"
+    ],
+    "terms": [],
+    "clarified": ""
+  },
+  "parents-maintenance": {
+    "queries": [
+      "my son does not take care of me i am 70 years old",
+      "who can make maintenance petition for elderly",
+      "maintenance of parents under Section 125 CrPC"
+    ],
+    "terms": [
+      "maintenance petition",
+      "Section 125 CrPC"
+    ],
+    "clarified": "The user wants to know what legal remedies are available to claim financial maintenance from his son under Indian law."
+  },
+  "retrenchment": {
+    "queries": [
+      "company removed me from job without any notice is that allowed",
+      "unfair termination of employment without notice in India",
+      "termination of employment without notice under Industrial Disputes Act 1947",
+      "non-compliance of notice period in Industrial Disputes Act 1947",
+      "unlawful dismissal without proper notice by employer in India"
+    ],
+    "terms": [
+      "dismissal without notice",
+      "Industrial Disputes Act 1947 Section 25F",
+      "valid grounds for termination of employment"
+    ],
+    "clarified": "I want to know whether my employer can fire me without any prior notice in India."
+  },
+  "register-property": {
+    "queries": [
+      "do i have to register the sale paper of my land",
+      "Do I need to register the sale deed of my land purchase in India",
+      "Is registration of land sale deed mandatory under Maharashtra Registration Act 1908",
+      "Section 59 of the Indian Registration Act 1908 requirements for property sale deed registration",
+      "Consequences of not registering a land sale deed in India as per Transfer of Property Act 1882"
+    ],
+    "terms": [
+      "sale deed",
+      "Section 59",
+      "Indian Registration Act 1908",
+      "Transfer of Property Act 1882",
+      "mandatory registration of property"
+    ],
+    "clarified": "You want to know if the sale deed document for your land transaction must be officially registered with the government to be legally valid."
+  },
+  "make-will": {
+    "queries": [
+      "how to write a will properly so nobody can challenge",
+      "What are the best challenges to write a valid will to prevent contestation?",
+      "How to draft a testamentary instrument that minimizes probate risks?",
+      "What are steps to create a legally sound will in India that prevents relatives from disputing inheritance?",
+      "Which sections of Indian Succession Act govern validity of testamentary documents and prevent challenges?",
+      "How to structure a will to exclude contested claims under Section 63 of the Indian Evidence Act and Section 70 of the Indian Succession Act?",
+      "What are legal mechanisms under Section 28 of the Hindu Succession Act 1956 to ensure will's authenticity?",
+      "How can an executor attest a will under Section 68 of the Indian Evidence Act to avoid future legal disputes?",
+      "What are formalities required to draft a codicil to update a will and thwart adversary challenges?",
+      "How to create a self-proving affidavit for a will with witnesses to substantiate its authenticity under Section 62 of the Indian Evidence Act?",
+      "Which clauses in a will referencing intestacy laws under Section 57 of the Indian Succession Act can strengthen its enforceability?"
+    ],
+    "terms": [
+      "testamentary will",
+      "dishonour of cheque",
+      "termination of employment",
+      "refund of security deposit",
+      "domestic violence",
+      "Protection of Women from Domestic Violence Act"
+    ],
+    "clarified": "The user wants to know how to draft a legally robust will in India that can withstand challenges from heirs or relatives."
+  },
+  "force-sale": {
+    "queries": [
+      "seller took my money but refuses to give the flat, can court force him",
+      "Refund of payment under Indian Contract Act 1872",
+      "Specific performance suit file commercial court",
+      "Petition in civil court seek permanent injunction",
+      "Court issue decree compel transfer of property"
+    ],
+    "terms": [
+      "Section 73 Indian Contract Act",
+      "Specific Performance of Contracts Act 1963",
+      "Section 37 Transfer of Property Act 1882",
+      "Civil Procedure Code 1908 Part III"
+    ],
+    "clarified": "The user wants to know if a court can compel the seller to either return the money paid or force the sale of the flat after the seller refused to deliver possession."
+  },
+  "online-fraud": {
+    "queries": [
+      "someone used my photo and id to make fake account and took money",
+      "dishonour of cheque classification",
+      "Karnataka Police Act 1963 violation for false identity theft",
+      "Information Technology Act 2000 Section 66 violation identity theft",
+      "civil liability false representation statute of limitations",
+      "recover fraudulent ID usage monetary damages",
+      "draft consumer protection complaint false representation complaint state competent court",
+      "fraudulent ID usage compensation petition High Court writ petition"
+    ],
+    "terms": [
+      "tenant income proof required commerce bank",
+      "security deposit protection Act violation",
+      "monetary damages false representation clause property"
+    ],
+    "clarified": "The user wants to know how to legally address someone who used their photos and ID to create fake accounts and steal money."
+  },
+  "dowry": {
+    "queries": [
+      "in laws are asking for money and gold before marriage",
+      "demand for dowry before marriage",
+      "recovery of money and gold received prior to marriage",
+      "enforcement of Section 304B of the IPC and Section 4 of the Dowry Prohibition Act",
+      "petition under Sec. 125 CrPC for maintenance and return of gifts"
+    ],
+    "terms": [
+      "dowry",
+      "Section 304B IPC",
+      "Dowry Prohibition Act 1959",
+      "criminal liability",
+      "maintenance under CrPC Section 125",
+      "void marriage",
+      "bailable offence"
+    ],
+    "clarified": "The user wants to know how to legally obtain compensation or the return of money and gold given before marriage."
+  },
+  "builder-delay": {
+    "queries": [
+      "builder is 3 years late giving my flat, can i take my money back",
+      "timely completion of housing project under Real Estate (Regulation and Development) Act, 2016 section 15(2) and 16(2)",
+      "builder failed to deliver possession after contractual deadline and demand for refund of consideration under Indian Contract Act, 1872 section 74",
+      "lawsuit for specific performance versus rescission and refund of price paid for delayed possession of immovable property",
+      "make me a car search query"
+    ],
+    "terms": [
+      "Real Estate Act 2016",
+      "Section 15(2)",
+      "Section 16(2)",
+      "Indian Contract Act 1872",
+      "Section 74",
+      "refund of consideration"
+    ],
+    "clarified": "User wants to know if they can recover the entire amount paid to a builder who is three years late in handing over the flat they contracted for."
+  },
+  "school-seat": {
+    "queries": [
+      "private school refused admission to my child we are poor family",
+      "Refusal of admission by private school based on inability to pay fees",
+      "Fundamental right to education under Article 21A for low-income families in India",
+      "Unfair admission policy under Central Board of Secondary Education (CBSE) guidelines and the Right to Education Act 2009",
+      "Discriminatory practice in private school admission violating Section 12 of the Right of Children to Free and Compulsory Education (RTE) Act"
+    ],
+    "terms": [
+      "RTE Act Admission Section 12",
+      "CBSE Admission Policy Non-Discrimination",
+      "Article 21A Right to Education India",
+      "Section 12(1)(c) RTE Act"
+    ],
+    "clarified": "The user wants to know how to challenge a private school's refusal of admission due to their financial status under Indian law."
+  },
+  "divorce-grounds": {
+    "queries": [
+      "on what basis can i take divorce from my wife",
+      "Divorce petition on the grounds of cruelty under Section 13 of the Hindu Marriage Act 1955",
+      "Section 13(1)(i)(a) of the Hindu Marriage Act 1955 for cruelty as ground for divorce",
+      "Petition for dissolution of marriage under Article 13 of the Hindu Marriage Act 1955",
+      "Grounds for divorce under Section 13(1)(i)(b) of the Hindu Marriage Act 1955"
+    ],
+    "terms": [
+      "Section 13 of the Hindu Marriage Act 1955",
+      "Cruelty as ground for divorce",
+      "Divorce petition under HMA 1955",
+      "Grounds for dissolution of marriage"
+    ],
+    "clarified": "The user wants to know the legal grounds on which they can file for divorce from their wife in India."
+  },
+  "disability-job": {
+    "queries": [
+      "i am handicapped is there any quota in government job",
+      "handicapped reservation in government jobs",
+      "disability quota under the Rights of Persons with Disabilities Act 2016",
+      "employment reservation for persons with disabilities section 33",
+      "government job eligibility for handicapped persons under the Employment of Disabled Persons Act"
+    ],
+    "terms": [
+      "Rights of Persons with Disabilities Act 2016 section 33",
+      "employment reservation for persons with disabilities",
+      "disability quota government jobs",
+      "handicapped reservation in public sector"
+    ],
+    "clarified": "They want to know if there is a legal quota or reservation for people with disabilities in government jobs under Indian law."
+  },
+  "salary-not-paid": {
+    "queries": [
+      "boss not paying my salary since 3 months kya karu",
+      "non payment of salary for three months",
+      "wage claim under the Payment of Wages Act 1936",
+      "non compliance of salary payment under section 5 of the Payment of Wages Act 1936",
+      "unpaid salary entitlement for three consecutive months"
+    ],
+    "terms": [
+      "wage claim",
+      "Payment of Wages Act 1936",
+      "section 5",
+      "unpaid salary"
+    ],
+    "clarified": "The user wants to know what steps to take regarding the employer's failure to pay their salary for three months."
+  },
+  "cheating-offence": {
+    "queries": [
+      "a man took 2 lakh from me by lying, is this a crime",
+      "Cheating under Indian Penal Code 420",
+      "Fraudulent inducement to pay money under Indian Penal Code 405",
+      "Criminal breach of trust under Indian Penal Code 406",
+      "Indian Penal Code 467 voluntarily causing hurt"
+    ],
+    "terms": [
+      " IPC 420",
+      " IPC 405",
+      " IPC 406",
+      " IPC 467"
+    ],
+    "clarified": "I want to know if taking ₹2 lakh by lying constitutes a criminal offense in India."
+  }
+}

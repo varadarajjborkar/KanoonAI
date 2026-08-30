@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { config } from '@/lib/config';
 import { embed } from '@/lib/ollama';
-import { bad } from '@/lib/http';
+import { bad, requireUser } from '@/lib/http';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -12,6 +12,12 @@ export const maxDuration = 60;
  * local hashing encoder instead of silently retrieving nothing.
  */
 export async function POST(req: Request) {
+  // This was the one route without an identity check. Harmless while no
+  // embedding model is configured (it just 501s), but the moment one is set it
+  // would be a free embedding API for anyone who found the URL.
+  const { error } = requireUser(req);
+  if (error) return error;
+
   let body: { texts?: unknown };
   try {
     body = await req.json();

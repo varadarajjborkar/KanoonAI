@@ -2,6 +2,8 @@
 
 Legal documents are written for lawyers. KanoonAI reads them for everyone else.
 
+**Live: [kanunai.vercel.app](https://kanunai.vercel.app/)**
+
 Upload a rent agreement, an offer letter, a loan sanction letter or a court
 notice, ask a question in your own words, and get an answer in plain language,
 with the exact clause it came from. It answers against the document you upload
@@ -22,6 +24,8 @@ Your documents never leave your browser.
 - [The corpus](#the-corpus)
 - [Parameter tuning](#parameter-tuning)
 - [Decision-tree tests](#decision-tree-tests)
+- [Daily token budget](#daily-token-budget)
+- [Security posture](#security-posture)
 - [Getting started](#getting-started)
 - [Configuration](#configuration)
 - [Scripts](#scripts)
@@ -245,6 +249,20 @@ parameter at a time (coordinate ascent, multiple passes) against a fixed batch
 of 24 gold queries in [`eval/goldset.json`](eval/goldset.json). A change is kept
 only if it improves the objective by a real margin.
 
+### Measuring it honestly
+
+Query rewriting is a model call, so it is not deterministic, and the whole
+pipeline inherits that. Measured across three independent rewrite samples with
+identical parameters, hit@topK ranged **0.583 to 0.750**. Tuning against a single
+sample therefore fits that sample rather than the pipeline, and any headline
+number from one run is partly luck.
+
+So the sweep averages every configuration over three fixed rewrite samples,
+committed in [`eval/rewrites/`](eval/rewrites/). That makes a run reproducible,
+and it makes a parameter earn its place across samples instead of exploiting the
+quirks of one. It also produced a better and steadier result: the tuned
+configuration's own spread across samples is 0.042, down from 0.071.
+
 The gold queries are written the way people actually type, including Hinglish
 and shaky grammar: *"cheque bounce ho gaya hai mera paisa kaise milega"*,
 *"boss not paying my salary since 3 months kya karu"*. A retrieved chunk counts
@@ -263,13 +281,24 @@ latency, money, and the model's attention.
 
 ### Result
 
+Averaged over three rewrite samples, 24 gold queries:
+
 | | baseline | tuned |
 |---|---|---|
-| hit@topK | 0.083 | **0.750** |
-| MRR | 0.014 | **0.488** |
-| nDCG | 0.030 | **0.758** |
-| context per query | 7,610 chars | **3,362 chars** |
-| retrieval latency | 15 ms | **15 ms** |
+| hit@topK | 0.083 | **0.778** |
+| MRR | 0.014 | **0.497** |
+| nDCG | 0.030 | **0.749** |
+| coverage | 0.083 | **0.715** |
+| spread across samples | — | 0.042 |
+
+22 of the 24 gold queries retrieve the exact right section of the exact right
+Act.
+
+**Held out:** re-generating the rewrite samples from scratch, so the tuned
+parameters have never seen them, gives **hit@topK 0.736**. The gap between 0.778
+and 0.736 is what is left of fitting the tuning samples; averaging over three of
+them shrank it but did not remove it. 0.736 is the number to believe for an
+unseen run, and the two queries that miss are the same ones either way.
 
 The full run, every parameter's table, and the per-query outcome are written to
 [`eval/report.md`](eval/report.md), and the winning values to
@@ -282,13 +311,13 @@ The full run, every parameter's table, and the per-query outcome are written to
   word for their problem, so bridging vocabulary is the whole game.
 - **Smaller chunks win.** `1800 → 600` characters. A statutory section is a
   natural retrieval unit and cutting across several dilutes every one of them.
-- **Heading weighting is worth 8x.** Statutory marginal notes state the topic
-  far more directly than the operative text.
-- **The re-ranker was rejected.** It cost about 400x the retrieval latency for a
-  gain below the noise floor on this batch, so it is off by default. The code is
-  there and one toggle switches it on.
-- **Neighbour expansion was rejected on cost.** It bought 8 points of hit rate
-  for 3.7x the context. Under the stated objective that is not a good trade.
+- **Heading weighting is worth 6x.** Statutory marginal notes state the topic
+  far more directly than the operative text does.
+- **The re-ranker was rejected twice.** At about 15x the retrieval latency it did
+  not merely fail to help, it scored slightly worse (-0.021 objective). It is off
+  by default; the code is there and one toggle switches it on.
+- **Neighbour expansion was rejected on cost.** It bought hit rate for several
+  times the context. Under the stated objective that is not a good trade.
 
 Every parameter is exposed in the Settings drawer, so the trade-offs can be felt
 directly rather than taken on trust.
@@ -307,10 +336,10 @@ budget, hallucinated citations, malformed model JSON, a missing username, a
 malformed request body, an oversized upload.
 
 ```
-$ npm run eval:tree
-44 passed, 0 failed
+$ npm test
+48 passed, 0 failed
 
-$ npm run eval:tree -- --http     # adds the live HTTP branch
+$ npm run test:http               # adds the live HTTP branch
 ```
 
 It exits non-zero on failure, so it works as a CI gate.
@@ -354,6 +383,10 @@ All optional except the API key.
 | `UPSTASH_REDIS_REST_URL` | *(blank)* | Blank falls back to in-memory history |
 | `UPSTASH_REDIS_REST_TOKEN` | *(blank)* | |
 | `NEXT_PUBLIC_MAX_DOC_CHARS` | `400000` | Per-document indexing cap |
+| `DAILY_TOKEN_BUDGET` | `100000` | Tokens per username per day |
+| `DAILY_DEVICE_TOKEN_BUDGET` | `100000` | Tokens per browser per day |
+| `GLOBAL_DAILY_TOKEN_BUDGET` | `2000000` | Tokens for the whole deployment per day |
+| `RATE_LIMIT_PER_MIN` | `30` | Requests per user per minute |
 
 **On choosing the fast model:** it must not emit hidden reasoning. On reasoning
 models the thinking tokens are charged against the generation budget, so a
@@ -391,17 +424,106 @@ native type stripping, so the tuner and the product can never drift apart.
 
 ## Deploying
 
-Vercel, with no other infrastructure:
+Running at [kanunai.vercel.app](https://kanunai.vercel.app/) on Vercel, with no
+other infrastructure:
 
-1. Push the repo and import it.
-2. Add `OLLAMA_API_KEY` (and the Upstash pair if you want cross-device history).
-3. Deploy.
+1. Push the repo and import it at [vercel.com/new](https://vercel.com/new).
+2. Add `OLLAMA_API_KEY`. The model names default to the verified set, so nothing
+   else is required.
+3. Optionally add Redis, either through Vercel's Upstash integration (which
+   injects `KV_REST_API_URL` / `KV_REST_API_TOKEN`) or a database created
+   directly on Upstash (`UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`).
+   Both naming schemes are read. Without it the app still works from browser
+   storage, but the per-user rate limiter has nothing durable to count in and is
+   effectively inert, which matters on a public URL.
+4. Deploy.
+
+`/api/health` reports which of these actually took effect, including which Redis
+variable naming it found.
 
 `public/corpus/` is served from the CDN, so serverless functions never touch it.
 Nothing else is persisted server-side, so there is no database to provision and
 no per-user storage to outgrow. `/api/vision` receives one page image at a time
 rather than a whole document, which keeps every request inside the serverless
 body limit and function timeout.
+
+---
+
+## Daily token budget
+
+The username is a namespace, not a credential, so on a public URL anyone can
+spend the deployment's model quota. Every model call is metered using the exact
+counts Ollama reports (`prompt_eval_count` + `eval_count`, no estimation) and
+charged against three scopes at once. The strictest one wins:
+
+| Scope | Default | Key |
+|---|---|---|
+| device | 100,000 tokens/day | a random id the browser generates and keeps |
+| user | 100,000 tokens/day | the username |
+| global | 2,000,000 tokens/day | the whole deployment |
+
+The budget is checked at the start of a turn, so a caller who is out is told
+before anything is billed rather than halfway through an answer. Usage is
+recorded after the model responds, including when the stream errors or the user
+presses stop, because those tokens were still generated. Counters are keyed by
+IST calendar day and expire on their own, so everything resets at midnight IST.
+
+The sidebar shows how much of the day is left, and the refusal names the reset
+time and reassures the user their documents are still in their browser.
+
+**This needs Redis to mean anything.** Counters live in the same store as chat
+history, and on serverless the in-memory fallback does not survive between
+invocations, so without Upstash the budget is decorative. `/api/quota` reports
+`enforceable: false` when that is the case rather than implying protection that
+is not there.
+
+**And it is a speed bump, not a wall.** Device ids and usernames are both
+client-supplied, so a determined person can reset either one. The global cap is
+the only scope they cannot walk around. Real protection for a public URL is
+access control, not metering.
+
+Tune with `DAILY_TOKEN_BUDGET`, `DAILY_DEVICE_TOKEN_BUDGET` and
+`GLOBAL_DAILY_TOKEN_BUDGET`.
+
+---
+
+## Security posture
+
+Audited against the live deployment.
+
+**What is enforced**
+
+- Every API route requires an `x-kanoon-user` header and returns 401 without it.
+- Guardrails run server-side, not only in the browser, so calling the API
+  directly is no way around them.
+- No CORS headers on `/api/*`, so only the app's own origin can call it.
+- PII is masked before it reaches a model or Redis.
+- Request bodies are schema-validated with Zod; malformed input returns 400,
+  never 500. Vision uploads over ~6 MB are refused with 413.
+- `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`,
+  `Permissions-Policy` and `Cross-Origin-Opener-Policy` are set on every
+  response; `/api/*` is `no-store` and `noindex`. HSTS comes from the host.
+- The API key stays server-side. Verified by grepping every client bundle on the
+  live deployment for the key and for server-only variable names: neither
+  appears.
+- Model output is rendered through react-markdown without `rehype-raw`, so no
+  raw HTML from a model or a document reaches the DOM.
+
+**Known exposures, stated plainly**
+
+- **The username is not authentication.** It is a namespace, by design. Anyone
+  with the URL can use the app, and therefore the deployment's model quota. The
+  brakes are a 30/min rate limit and the [daily token budget](#daily-token-budget),
+  and both need Redis to be durable: without it, serverless instances each start
+  with an empty counter and neither is enforced. For a public deployment,
+  configure Redis and consider putting the site behind access control.
+- **Prompt injection via an uploaded document** is not fully solved. Input
+  guardrails cover the user's message; a hostile instruction inside a PDF is
+  mitigated by the answer prompt's grounding rules and by stripping citations
+  that point at nothing, but it is mitigation, not a guarantee.
+- **The vision model transcribes whatever it is shown**, and a transcription
+  error is not distinguishable from the document by the pipeline downstream.
+  Pages read by vision are labelled as such in the UI for that reason.
 
 ---
 
@@ -419,6 +541,7 @@ src/
       memory            durable user facts
       vision            page-image transcription
       health            what is actually configured and reachable
+      quota             today's remaining token budget
     page.tsx            app shell
   components/           sidebar, chat view, composer, citations, risks, settings
   lib/
@@ -451,12 +574,17 @@ scripts/
 
 ## Known limitations
 
-- **Retrieval is at 75% on the gold set**, measured strictly. Six queries still
-  miss, and the cause is documented rather than papered over: at
-  `headingWeight: 8` a coincidental heading match can beat the correct section
-  ("unauthorized use of goods bailed" wins on an online-fraud query). The sweep
-  still selects 8 because it wins on balance. Proper per-field BM25F length
-  normalisation is the fix, rather than repeating heading tokens.
+- **Retrieval is at 78% on the gold set**, measured strictly: right Act *and*
+  right section. Two queries still miss in every sample. `deposit-not-returned`
+  wants s.108 of the Transfer of Property Act, whose heading ("Rights and
+  liabilities of lessor and lessee") never mentions deposits; `retrenchment`
+  wants s.25F of the Industrial Disputes Act, which the rewriter reliably
+  describes in words the section does not use. Both are vocabulary gaps that
+  heading weighting cannot close.
+- **The pipeline is not deterministic.** Rewriting is a model call, so the same
+  question can retrieve differently on two runs. The tuned configuration varies
+  by about 0.04 hit@topK across rewrite samples. Reported numbers are averages,
+  not best-of.
 - **The corpus is 40 Acts, not all of Indian law.** Questions outside it fall
   back to a grounded "I could not find this" rather than a guess. State
   amendments, rules, and case law are not included.

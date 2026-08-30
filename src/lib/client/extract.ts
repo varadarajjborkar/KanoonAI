@@ -13,6 +13,8 @@
  * scan is 40 small requests instead of one that would exceed the body limit.
  */
 
+import { authHeaders } from './device.ts';
+
 export interface ExtractedPage {
   page: number;
   text: string;
@@ -253,7 +255,7 @@ async function downscaleImage(file: File, maxEdge: number): Promise<string> {
 async function visionRead(dataUrl: string, page: number, opts: ExtractOptions): Promise<string> {
   const res = await fetch('/api/vision', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-kanoon-user': opts.user },
+    headers: authHeaders(opts.user),
     body: JSON.stringify({ image: dataUrl, page }),
     signal: opts.signal,
   });

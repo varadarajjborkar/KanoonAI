@@ -89,6 +89,13 @@ export function db(): Store {
 
 export const backend = () => (hasRedis() ? 'upstash' : 'memory');
 
+/**
+ * Whether anything written here survives between requests. On serverless the
+ * in-memory fallback does not, which makes counters (rate limit, token quota)
+ * decorative rather than enforced. Callers surface that rather than pretend.
+ */
+export const hasRedisBackend = () => hasRedis();
+
 /* ---------------------------------------------------------------- keys */
 const kChat = (u: string, id: string) => `kanoon:${u}:chat:${id}`;
 const kIndex = (u: string) => `kanoon:${u}:chats`;

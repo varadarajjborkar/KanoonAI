@@ -166,3 +166,45 @@ export function fmt(n, d = 3) {
 export function loadBatch() {
   return JSON.parse(fs.readFileSync('eval/goldset.json', 'utf8')).batch;
 }
+
+/**
+ * Run the batch once per rewrite sample and average.
+ *
+ * This is what the sweep optimises, so a parameter has to help across samples
+ * rather than exploit the quirks of one.
+ */
+export async function evaluateAveraged(batch, paramOverrides, expansions, opts = {}) {
+  if (!expansions.length) return evaluate(batch, paramOverrides, opts);
+
+  const runs = [];
+  for (const queryExpansion of expansions) {
+    runs.push(await evaluate(batch, paramOverrides, { ...opts, queryExpansion }));
+  }
+  const avg = (k) => runs.reduce((a, r) => a + r[k], 0) / runs.length;
+
+  // A query counts as a miss only if it missed in every sample; that is the
+  // honest way to report which queries the pipeline genuinely cannot reach.
+  const ids = runs[0].perQuery.map((q) => q.id);
+  const perQuery = ids.map((id, i) => ({
+    id,
+    hit: runs.some((r) => r.perQuery[i].hit) ? 1 : 0,
+    rr: runs.reduce((a, r) => a + r.perQuery[i].rr, 0) / runs.length,
+    coverage: runs.reduce((a, r) => a + r.perQuery[i].coverage, 0) / runs.length,
+  }));
+
+  return {
+    hit: avg('hit'),
+    mrr: avg('mrr'),
+    ndcg: avg('ndcg'),
+    precision: avg('precision'),
+    coverage: avg('coverage'),
+    avgContext: avg('avgContext'),
+    avgReturned: avg('avgReturned'),
+    msPerQuery: avg('msPerQuery'),
+    objective: avg('objective'),
+    hitSpread: Math.max(...runs.map((r) => r.hit)) - Math.min(...runs.map((r) => r.hit)),
+    samples: runs.length,
+    perQuery,
+    chunkCount: runs[0].chunkCount,
+  };
+}

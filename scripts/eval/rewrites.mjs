@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 import { REWRITE_SYSTEM } from '../../src/lib/agents/prompts.ts';
 import { parseLooseJSON } from '../../src/lib/ollama.ts';
+import { filterOnTopic } from '../../src/lib/agents/rewrite-guard.ts';
 
 const CACHE = 'eval/cache/rewrites.json';
 
@@ -50,7 +51,7 @@ export async function ensureRewrites(batch, { extra = 3, force = false } = {}) {
       const queries = [item.query, ...(parsed.queries ?? [])]
         .map((q) => String(q).trim())
         .filter((q, i, a) => q.length > 2 && a.indexOf(q) === i);
-      cache[item.id] = { queries, terms: parsed.terms ?? [] };
+      cache[item.id] = { queries, terms: parsed.terms ?? [], clarified: parsed.clarified ?? '' };
     } catch (err) {
       console.warn(`\n! rewrite failed for ${item.id}: ${err.message}`);
       cache[item.id] = { queries: [item.query], terms: [] };
@@ -63,12 +64,36 @@ export async function ensureRewrites(batch, { extra = 3, force = false } = {}) {
   return cache;
 }
 
+/**
+ * The fixed rewrite samples the sweep tunes against.
+ *
+ * Rewriting is a model call, so it is not deterministic: measured across three
+ * independent samples, hit@topK on the gold set ranged 0.583 to 0.750 with the
+ * same parameters. Tuning against a single sample therefore fits the sample,
+ * not the pipeline. These are generated once, committed, and averaged over, so
+ * a sweep is both honest and reproducible.
+ */
+export function loadSamples() {
+  const dir = 'eval/rewrites';
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith('.json'))
+    .sort()
+    .map((f) => JSON.parse(fs.readFileSync(`${dir}/${f}`, 'utf8')));
+}
+
 /** Builds the queryExpansion hook the evaluator calls. */
 export function expansionFrom(cache) {
   return (item, multiQuery, useTerms) => {
     const entry = cache[item.id];
     if (!entry) return [item.query];
-    const queries = multiQuery > 0 ? entry.queries.slice(0, multiQuery + 1) : [item.query];
+    // Same guard the product applies, so the sweep tunes what actually ships.
+    const guarded = [
+      item.query,
+      ...filterOnTopic(item.query, entry.queries.slice(1), entry.clarified ?? '', entry.terms ?? []),
+    ];
+    const queries = multiQuery > 0 ? guarded.slice(0, multiQuery + 1) : [item.query];
     const terms = (entry.terms ?? []).join(' ').trim();
     return useTerms && terms.length > 8 ? [...queries, terms] : queries;
   };

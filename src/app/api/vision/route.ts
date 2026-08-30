@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { readImage } from '@/lib/ollama';
 import { VISION_PROMPT } from '@/lib/agents/prompts';
-import { bad, requireUser } from '@/lib/http';
+import { bad, deviceFrom, quotaExhausted, requireUser } from '@/lib/http';
+import { checkQuota, exhaustedMessage, recordUsage } from '@/lib/quota';
 import { rateLimit } from '@/lib/redis';
 import { config } from '@/lib/config';
 
@@ -38,8 +39,18 @@ export async function POST(req: Request) {
     return bad('You are going a bit fast. Wait a minute and try again.', 429);
   }
 
+  // Page images are the most expensive thing this app sends, so the budget is
+  // checked before every single page rather than once per document.
+  const device = deviceFrom(req);
+  const quota = await checkQuota(user!, device);
+  if (!quota.ok) return quotaExhausted(exhaustedMessage(quota), quota.resetAt);
+
   try {
-    const text = await readImage(image, VISION_PROMPT);
+    let spent = 0;
+    const text = await readImage(image, VISION_PROMPT, undefined, (u) => {
+      spent += u.total;
+    });
+    await recordUsage(user!, device, spent);
     const clean = text.trim();
     return NextResponse.json({
       text: clean === '[NO_TEXT]' ? '' : clean,

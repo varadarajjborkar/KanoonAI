@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import {
-  FileText, HardDrive, LogOut, MessageSquarePlus, PanelLeftClose,
+  FileText, Gauge, HardDrive, LogOut, MessageSquarePlus, PanelLeftClose,
   Scale, Settings2, Trash2, X,
 } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
@@ -13,7 +13,7 @@ import { relativeTime } from '@/lib/client/format';
 export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   // Selector, not a whole-store subscription: the sidebar must not re-render on
   // every streamed token.
-  const { user, chats, activeId, docs, scopedDocIds, storage } = useApp(
+  const { user, chats, activeId, docs, scopedDocIds, storage, quota } = useApp(
     useShallow((s) => ({
       user: s.user,
       chats: s.chats,
@@ -21,6 +21,7 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
       docs: s.docs,
       scopedDocIds: s.scopedDocIds,
       storage: s.storage,
+      quota: s.quota,
     })),
   );
   const { newChat, openChat, removeChat, removeDoc, toggleScope, signOut, refreshStorage } =
@@ -146,6 +147,33 @@ export function Sidebar({ open, onClose }: { open: boolean; onClose: () => void 
 
         {/* ------------------------------------------------------ footer */}
         <div className="border-t border-[var(--color-line)] px-3 py-3">
+          {quota && quota.enforceable && (
+            <div className="mb-2.5 px-1">
+              <div className="mb-1 flex items-center gap-1.5 text-[11px] text-[var(--color-faint)]">
+                <Gauge size={11} />
+                {Math.round((quota.remaining / Math.max(1, quota.limit)) * 100)}% of today's
+                allowance left
+              </div>
+              <div className="h-1 overflow-hidden rounded-full bg-[var(--color-line)]">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${Math.max(2, (quota.remaining / Math.max(1, quota.limit)) * 100)}%`,
+                    background:
+                      quota.remaining / quota.limit < 0.15
+                        ? 'var(--color-risk-high)'
+                        : 'var(--color-law)',
+                  }}
+                />
+              </div>
+              {quota.remaining === 0 && (
+                <p className="mt-1 text-[11px] leading-relaxed text-[var(--color-risk-high)]">
+                  Used up for today. Resets at midnight IST.
+                </p>
+              )}
+            </div>
+          )}
+
           {storage && (
             <div className="mb-2.5 px-1">
               <div className="mb-1 flex items-center gap-1.5 text-[11px] text-[var(--color-faint)]">

@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkInput } from '@/lib/guardrails';
 import { routeQuery, rewriteQuery } from '@/lib/agents';
-import { bad, requireUser } from '@/lib/http';
+import { bad, deviceFrom, quotaExhausted, requireUser } from '@/lib/http';
+import { checkQuota, exhaustedMessage, recordUsage } from '@/lib/quota';
 import { getMemory, rateLimit } from '@/lib/redis';
 import { config, hasOllama } from '@/lib/config';
 
@@ -45,6 +46,12 @@ export async function POST(req: Request) {
     return bad('You are going a bit fast. Wait a minute and try again.', 429);
   }
 
+  // Token budget is checked at the front of the turn, so a caller who is out is
+  // told before any model is billed rather than halfway through an answer.
+  const device = deviceFrom(req);
+  const quota = await checkQuota(user!, device);
+  if (!quota.ok) return quotaExhausted(exhaustedMessage(quota), quota.resetAt);
+
   const memory = await getMemory(user!).catch(() => []);
 
   // With no model key we still return a usable plan so BM25 retrieval works.
@@ -67,10 +74,16 @@ export async function POST(req: Request) {
   // The router and the rewriter do not depend on each other, so they run
   // together. Sequentially they were the slowest stage in the whole request
   // (~4.5s of a ~10s answer); in parallel the stage costs one model call.
+  let spent = 0;
+  const meter = (u: { total: number }) => {
+    spent += u.total;
+  };
+
   const [route, rewritten] = await Promise.all([
-    routeQuery(verdict.sanitised, hasDocs),
-    rewriteQuery(verdict.sanitised, multiQuery, history),
+    routeQuery(verdict.sanitised, hasDocs, undefined, meter),
+    rewriteQuery(verdict.sanitised, multiQuery, history, undefined, meter),
   ]);
+  await recordUsage(user!, device, spent);
 
   // Smalltalk and out-of-scope skip retrieval, so their rewrites are discarded.
   const rewrite = route.needsRetrieval
@@ -89,5 +102,12 @@ export async function POST(req: Request) {
     notices: verdict.notices,
     memory: memory.map((m) => m.text),
     degraded: false,
+    quota: {
+      remaining: Math.max(0, quota.tightest.remaining - spent),
+      limit: quota.tightest.limit,
+      scope: quota.tightest.scope,
+      resetAt: quota.resetAt,
+      enforceable: quota.enforceable,
+    },
   });
 }

@@ -71,10 +71,24 @@ Reply with JSON only:
 {"queries":["...","..."],"terms":["..."],"clarified":"..."}
 
 RULES FOR "queries" (produce ${'${n}'} of them):
+- EVERY query must be about the user's own situation. If they ask about a bounced
+  cheque, every single query is about bounced cheques. Never emit a query about an
+  area of law the user did not raise.
 - The FIRST query stays close to the user's own words.
-- EVERY OTHER query must be in formal English legal vocabulary, whatever language the user wrote in. Never just paraphrase Hinglish into more Hinglish - that finds nothing, because the statutes are in English.
-- Translate the everyday word into the statutory word: "cheque bounced" -> "dishonour of cheque"; "fired me" -> "termination of employment, retrenchment"; "deposit not returned" -> "refund of security deposit, lessor obligations"; "beats me" -> "domestic violence, protection order".
-- Name the Act or section number when you are confident of it.
+- EVERY OTHER query must be in formal English legal vocabulary, whatever language
+  the user wrote in. Never just paraphrase Hinglish into more Hinglish; that finds
+  nothing, because the statutes are in English.
+- Be specific. Name the Act and the section number whenever you are reasonably
+  confident of it. "unpaid salary claim in India" is a bad query;
+  "non-payment of wages under the Payment of Wages Act 1936" is a good one.
+
+TRANSLATING EVERYDAY WORDS INTO STATUTORY ONES is the core of the job. The pairs
+below show the KIND of move to make. They are illustrations of the technique, not
+topics to search for: only ever apply this to what the user actually asked about.
+  "cheque bounced"        -> "dishonour of cheque"
+  "fired me"              -> "termination of employment, retrenchment"
+  "deposit not returned"  -> "refund of security deposit, lessor obligations"
+  "he beats me"           -> "domestic violence, protection order"
 
 "terms": the specific legal terms, section numbers or Act names worth matching on.
 "clarified": one sentence restating what the user actually wants to know, in plain English.

@@ -6,6 +6,7 @@ import type { RagParams } from '../rag/params.ts';
 import { TUNED_PARAMS } from '../rag/tuned.ts';
 import { STORES, del, deleteDoc, get, getAll, listDocs, put, storageEstimate, wipeAll } from './idb.ts';
 import { ask, ingestFile, invalidateIndex } from './pipeline.ts';
+import { authHeaders } from './device.ts';
 
 /**
  * Application state.
@@ -68,6 +69,8 @@ interface AppState {
   resetParams: () => void;
 
   storage: { usedMB: number; quotaMB: number } | null;
+  quota: { remaining: number; limit: number; scope: string; resetAt: number; enforceable: boolean } | null;
+  refreshQuota: () => Promise<void>;
   refreshStorage: () => Promise<void>;
   wipe: () => Promise<void>;
 
@@ -89,7 +92,7 @@ async function syncChat(user: string, chat: LocalChat): Promise<void> {
   // Redis is a mirror, never a blocker.
   await fetch('/api/chats', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-kanoon-user': user },
+    headers: authHeaders(user),
     body: JSON.stringify({
       id: chat.id,
       title: chat.title,
@@ -114,6 +117,7 @@ export const useApp = create<AppState>((set, getState) => ({
   uploading: null,
   params: TUNED_PARAMS,
   storage: null,
+  quota: null,
   banner: null,
 
   /* ------------------------------------------------------------ identity */
@@ -132,7 +136,12 @@ export const useApp = create<AppState>((set, getState) => ({
       params: savedParams ? { ...TUNED_PARAMS, ...JSON.parse(savedParams) } : TUNED_PARAMS,
     });
 
-    await Promise.all([getState().refreshChats(), getState().refreshDocs(), getState().refreshStorage()]);
+    await Promise.all([
+      getState().refreshChats(),
+      getState().refreshDocs(),
+      getState().refreshStorage(),
+      getState().refreshQuota(),
+    ]);
     getState().newChat();
   },
 
@@ -154,7 +163,7 @@ export const useApp = create<AppState>((set, getState) => ({
       set({ activeId: id, messages: local.messages, scopedDocIds: local.docIds ?? [], streaming: '' });
     }
     if (!user) return;
-    const res = await fetch(`/api/chats/${id}`, { headers: { 'x-kanoon-user': user } }).catch(() => null);
+    const res = await fetch(`/api/chats/${id}`, { headers: authHeaders(user) }).catch(() => null);
     if (!res?.ok) return;
     const { chat } = (await res.json()) as { chat: LocalChat };
     if (chat && (!local || chat.updatedAt >= local.updatedAt)) {
@@ -171,7 +180,7 @@ export const useApp = create<AppState>((set, getState) => ({
     if (user) {
       await fetch(`/api/chats/${id}`, {
         method: 'DELETE',
-        headers: { 'x-kanoon-user': user },
+        headers: authHeaders(user),
       }).catch(() => undefined);
     }
     if (activeId === id) getState().newChat();
@@ -201,7 +210,7 @@ export const useApp = create<AppState>((set, getState) => ({
       });
     }
 
-    const res = await fetch('/api/chats', { headers: { 'x-kanoon-user': user } }).catch(() => null);
+    const res = await fetch('/api/chats', { headers: authHeaders(user) }).catch(() => null);
     if (res?.ok) {
       const { chats } = (await res.json()) as { chats: ChatSummary[] };
       // The server copy wins on ties: it is the one shared across devices.
@@ -273,6 +282,7 @@ export const useApp = create<AppState>((set, getState) => ({
       } finally {
         set({ uploading: null });
         await getState().refreshStorage();
+        void getState().refreshQuota();
       }
     }
   },
@@ -340,7 +350,7 @@ export const useApp = create<AppState>((set, getState) => ({
       if (!result.blocked) {
         fetch('/api/memory', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-kanoon-user': user },
+          headers: authHeaders(user),
           body: JSON.stringify({ exchange: `User: ${text}\nAssistant: ${result.answer.slice(0, 1500)}` }),
         }).catch(() => undefined);
       }
@@ -350,6 +360,7 @@ export const useApp = create<AppState>((set, getState) => ({
     } finally {
       controller = null;
       set({ busy: false, corpus: null });
+      void getState().refreshQuota();
     }
   },
 
@@ -372,6 +383,15 @@ export const useApp = create<AppState>((set, getState) => ({
     localStorage.removeItem(PARAMS_KEY);
     invalidateIndex();
     set({ params: TUNED_PARAMS });
+  },
+
+  /** Today's remaining token budget, shown in the sidebar. */
+  async refreshQuota() {
+    const { user } = getState();
+    if (!user) return;
+    const res = await fetch('/api/quota', { headers: authHeaders(user) }).catch(() => null);
+    if (!res?.ok) return;
+    set({ quota: await res.json() });
   },
 
   async refreshStorage() {

@@ -1,6 +1,7 @@
 import { config } from '../config.ts';
-import { chatJSON, type ChatMessage } from '../ollama.ts';
+import { chatJSON, type ChatMessage, type Usage } from '../ollama.ts';
 import type { RetrievalHit } from '../types.ts';
+import { filterOnTopic } from './rewrite-guard.ts';
 import {
   GRADER_SYSTEM,
   MEMORY_SYSTEM,
@@ -59,6 +60,7 @@ export async function routeQuery(
   query: string,
   hasDocs: boolean,
   signal?: AbortSignal,
+  onUsage?: (u: Usage) => void,
 ): Promise<RouteResult> {
   const quick = quickRoute(query, hasDocs);
   if (quick) return quick;
@@ -78,7 +80,7 @@ export async function routeQuery(
         content: `User has ${hasDocs ? 'uploaded a document' : 'not uploaded anything'}.\nMessage: ${query}`,
       },
     ],
-    { model: config.ollama.fastModel, maxTokens: 500, signal, think: false },
+    { model: config.ollama.fastModel, maxTokens: 500, signal, think: false, onUsage },
   ).catch(() => null);
 
   if (!res || !VALID_INTENTS.includes(res.intent)) return fallback;
@@ -107,6 +109,7 @@ export async function rewriteQuery(
   extraQueries: number,
   history: string,
   signal?: AbortSignal,
+  onUsage?: (u: Usage) => void,
 ): Promise<RewriteResult> {
   const fallback: RewriteResult = { queries: [query], terms: [], clarified: query };
   if (extraQueries <= 0) return fallback;
@@ -119,11 +122,19 @@ export async function rewriteQuery(
         content: history ? `Conversation so far:\n${history}\n\nNew message: ${query}` : query,
       },
     ],
-    { model: config.ollama.fastModel, maxTokens: 900, signal, think: false },
+    { model: config.ollama.fastModel, maxTokens: 900, signal, think: false, onUsage },
   ).catch(() => null);
 
   if (!res?.queries?.length) return fallback;
-  const queries = [query, ...res.queries.filter((q) => typeof q === 'string' && q.trim())]
+
+  const cleaned = filterOnTopic(
+    query,
+    res.queries.filter((q): q is string => typeof q === 'string' && q.trim().length > 2),
+    typeof res.clarified === 'string' ? res.clarified : '',
+    Array.isArray(res.terms) ? res.terms.filter((t) => typeof t === 'string') : [],
+  );
+
+  const queries = [query, ...cleaned]
     .map((q) => q.trim())
     .filter((q, i, arr) => q.length > 2 && arr.indexOf(q) === i)
     .slice(0, extraQueries + 1);
@@ -140,6 +151,7 @@ export async function rerankHits(
   query: string,
   hits: RetrievalHit[],
   signal?: AbortSignal,
+  onUsage?: (u: Usage) => void,
 ): Promise<RetrievalHit[]> {
   if (hits.length < 2) return hits;
   const listing = hits
@@ -151,7 +163,7 @@ export async function rerankHits(
       { role: 'system', content: RERANK_SYSTEM },
       { role: 'user', content: `QUESTION: ${query}\n\nPASSAGES:\n${listing}` },
     ],
-    { model: config.ollama.fastModel, maxTokens: 500, signal, think: false },
+    { model: config.ollama.fastModel, maxTokens: 500, signal, think: false, onUsage },
   ).catch(() => null);
 
   if (!res?.order?.length) return hits;
@@ -173,6 +185,7 @@ export async function gradeHits(
   query: string,
   hits: RetrievalHit[],
   signal?: AbortSignal,
+  onUsage?: (u: Usage) => void,
 ): Promise<RetrievalHit[]> {
   if (hits.length < 3) return hits;
   const listing = hits
@@ -184,7 +197,7 @@ export async function gradeHits(
       { role: 'system', content: GRADER_SYSTEM },
       { role: 'user', content: `QUESTION: ${query}\n\nPASSAGES:\n${listing}` },
     ],
-    { model: config.ollama.fastModel, maxTokens: 400, signal, think: false },
+    { model: config.ollama.fastModel, maxTokens: 400, signal, think: false, onUsage },
   ).catch(() => null);
 
   if (!res?.keep?.length) return hits;
@@ -196,13 +209,14 @@ export async function gradeHits(
 export async function extractMemory(
   exchange: string,
   signal?: AbortSignal,
+  onUsage?: (u: Usage) => void,
 ): Promise<string[]> {
   const res = await chatJSON<{ facts: string[] }>(
     [
       { role: 'system', content: MEMORY_SYSTEM },
       { role: 'user', content: exchange.slice(0, 4000) },
     ],
-    { model: config.ollama.fastModel, maxTokens: 500, signal, think: false },
+    { model: config.ollama.fastModel, maxTokens: 500, signal, think: false, onUsage },
   ).catch(() => null);
 
   return (res?.facts ?? [])

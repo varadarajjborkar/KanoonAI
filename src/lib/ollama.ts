@@ -20,6 +20,19 @@ export class OllamaError extends Error {
   }
 }
 
+/** Real usage as reported by the model, not an estimate. */
+export interface Usage {
+  promptTokens: number;
+  completionTokens: number;
+  total: number;
+}
+
+function usageFrom(d: { prompt_eval_count?: number; eval_count?: number }): Usage {
+  const promptTokens = d.prompt_eval_count ?? 0;
+  const completionTokens = d.eval_count ?? 0;
+  return { promptTokens, completionTokens, total: promptTokens + completionTokens };
+}
+
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
@@ -37,6 +50,8 @@ interface ChatOpts {
   signal?: AbortSignal;
   /** Disable chain-of-thought on models that support it, for latency. */
   think?: boolean;
+  /** Receives the exact token usage once the model has responded. */
+  onUsage?: (u: Usage) => void;
   /** Internal: guards the one retry we allow for budget-exhausted responses. */
   _retriedForLength?: boolean;
 }
@@ -121,7 +136,12 @@ export async function chat(messages: ChatMessage[], o: ChatOpts = {}): Promise<s
   const data = (await res.json()) as {
     message?: { content?: string; thinking?: string };
     done_reason?: string;
+    prompt_eval_count?: number;
+    eval_count?: number;
   };
+  // Reported even on a truncated response, and it was still billed, so it is
+  // recorded before any retry decision.
+  o.onUsage?.(usageFrom(data));
   const content = data.message?.content ?? '';
 
   // Reasoning models put chain-of-thought in `thinking`, and those tokens are
@@ -192,7 +212,14 @@ export async function* chatStream(
       const t = line.trim();
       if (!t) continue;
       try {
-        const j = JSON.parse(t) as { message?: { content?: string }; done?: boolean };
+        const j = JSON.parse(t) as {
+          message?: { content?: string };
+          done?: boolean;
+          prompt_eval_count?: number;
+          eval_count?: number;
+        };
+        // The final frame of a stream carries the token counts for the whole call.
+        if (j.done) o.onUsage?.(usageFrom(j));
         const delta = j.message?.content;
         if (delta) yield delta;
       } catch {
@@ -203,17 +230,27 @@ export async function* chatStream(
 }
 
 /** Batch embeddings. Returns [] when no embed model is configured. */
-export async function embed(texts: string[], signal?: AbortSignal): Promise<number[][]> {
+export async function embed(
+  texts: string[],
+  signal?: AbortSignal,
+  onUsage?: (u: Usage) => void,
+): Promise<number[][]> {
   if (!config.ollama.embedModel || texts.length === 0) return [];
   const res = await withRetry(() =>
     call('/api/embed', { model: config.ollama.embedModel, input: texts }, signal),
   );
-  const data = (await res.json()) as { embeddings?: number[][] };
+  const data = (await res.json()) as { embeddings?: number[][]; prompt_eval_count?: number };
+  onUsage?.(usageFrom(data));
   return data.embeddings ?? [];
 }
 
 /** Ask the vision model to transcribe a page image. */
-export async function readImage(base64: string, hint: string, signal?: AbortSignal): Promise<string> {
+export async function readImage(
+  base64: string,
+  hint: string,
+  signal?: AbortSignal,
+  onUsage?: (u: Usage) => void,
+): Promise<string> {
   return chat(
     [
       {
@@ -222,6 +259,6 @@ export async function readImage(base64: string, hint: string, signal?: AbortSign
         images: [base64.replace(/^data:image\/\w+;base64,/, '')],
       },
     ],
-    { model: config.ollama.visionModel, temperature: 0, maxTokens: 2400, signal, think: false },
+    { model: config.ollama.visionModel, temperature: 0, maxTokens: 2400, signal, think: false, onUsage },
   );
 }

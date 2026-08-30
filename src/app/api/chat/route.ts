@@ -9,7 +9,8 @@ import {
   SIMPLIFY_SYSTEM,
   answerUserPrompt,
 } from '@/lib/agents/prompts';
-import { bad, requireUser } from '@/lib/http';
+import { bad, deviceFrom, quotaExhausted, requireUser } from '@/lib/http';
+import { checkQuota, exhaustedMessage, recordUsage } from '@/lib/quota';
 import { rateLimit } from '@/lib/redis';
 
 export const runtime = 'nodejs';
@@ -62,6 +63,10 @@ export async function POST(req: Request) {
     return bad('You are going a bit fast. Wait a minute and try again.', 429);
   }
 
+  const device = deviceFrom(req);
+  const quota = await checkQuota(user!, device);
+  if (!quota.ok) return quotaExhausted(exhaustedMessage(quota), quota.resetAt);
+
   const grounded = b.context.trim().length > 0;
   const system = grounded ? ANSWER_SYSTEM : NO_CONTEXT_SYSTEM;
 
@@ -87,11 +92,16 @@ export async function POST(req: Request) {
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       let full = '';
+      let spent = 0;
+      const meter = (u: { total: number }) => {
+        spent += u.total;
+      };
       try {
         for await (const delta of chatStream(messages, {
           temperature: 0.25,
           maxTokens: 1400,
           signal: req.signal,
+          onUsage: meter,
         })) {
           full += delta;
           controller.enqueue(sse({ type: 'delta', text: delta }));
@@ -114,7 +124,7 @@ export async function POST(req: Request) {
               { role: 'system', content: SIMPLIFY_SYSTEM },
               { role: 'user', content: finalText },
             ],
-            { temperature: 0.2, maxTokens: 1500, signal: req.signal, think: false },
+            { temperature: 0.2, maxTokens: 1500, signal: req.signal, think: false, onUsage: meter },
           ).catch(() => '');
 
           const after = simpler ? readability(simpler) : null;
@@ -149,7 +159,10 @@ export async function POST(req: Request) {
           }),
         );
       } finally {
-        controller.enqueue(sse({ type: 'done' }));
+        // Recorded even when the stream errored or the user hit stop: those
+        // tokens were still generated and still billed.
+        await recordUsage(user!, device, spent).catch(() => undefined);
+        controller.enqueue(sse({ type: 'done', tokens: spent }));
         controller.close();
       }
     },

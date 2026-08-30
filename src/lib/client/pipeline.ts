@@ -10,6 +10,7 @@ import { scanRisks } from '../risk.ts';
 import { STORES, allUserChunks, put, putMany } from './idb.ts';
 import { loadCorpus, loadManifest } from './corpus.ts';
 import { extractFile, type ExtractOptions } from './extract.ts';
+import { authHeaders } from './device.ts';
 
 /**
  * The client-side half of the RAG pipeline.
@@ -220,7 +221,7 @@ export async function ask(opts: {
   const tPrep = performance.now();
   const prepRes = await fetch('/api/agent/prepare', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-kanoon-user': user },
+    headers: authHeaders(user),
     body: JSON.stringify({
       query: question,
       hasDocs: opts.docIds.length > 0,
@@ -310,7 +311,7 @@ export async function ask(opts: {
 
   const res = await fetch('/api/chat', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-kanoon-user': user },
+    headers: authHeaders(user),
     body: JSON.stringify({
       question: prep.sanitised,
       context,
@@ -416,7 +417,7 @@ async function rerankViaApi(
 ): Promise<RetrievalHit[]> {
   const res = await fetch('/api/agent/rerank', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-kanoon-user': user },
+    headers: authHeaders(user),
     body: JSON.stringify({
       query,
       passages: hits.map((h) => ({
